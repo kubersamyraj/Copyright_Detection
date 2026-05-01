@@ -6,3 +6,6 @@ numpy
 scipy
 matplotlib
 ffmpeg-python
+
+(Create an uploads folder in the main folder that contains app.py if you need to save the entire file like audios and videos into your pc,
+further more we can use such videos and music to be displayed like a social media platform)

@@ -1,0 +1,85 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<div class="page-center result-page">
+    <div class="container result-card">
+        <h2>Copyright Detection Result</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h4>Audio Similarity</h4>
+                <p class="summary-value">{{ audio_score }}%</p>
+            </div>
+            <div class="summary-card">
+                <h4>Video Similarity</h4>
+                <p class="summary-value">{{ video_score }}%</p>
+            </div>
+            <div class="summary-card">
+                <h4>Final Confidence</h4>
+                <p class="summary-value">{{ final_score }}%</p>
+            </div>
+        </div>
+
+        <div class="result-row">
+            <div class="result-label">File Name:</div>
+            <div class="result-value">{{ filename }}</div>
+        </div>
+        {% if matched_file %}
+            <div class="result-row">
+                <div class="result-label">Matched File:</div>
+                <div class="result-value">{{ matched_file }}</div>
+            </div>
+        {% endif %}
+
+        <h3>Status</h3>
+
+        {% if detected %}
+            <p class="danger">{{ message }}</p>
+        {% else %}
+            <p class="success">{{ message }}</p>
+        {% endif %}
+
+        <hr>
+
+        {% if tx_hash %}
+            <div class="result-row">
+                <div class="result-label">Blockchain ID:</div>
+                <div class="result-value">{{ tx_hash }}</div>
+            </div>
+        {% endif %}
+
+        <hr>
+        <h3>Detection Statistics</h3>
+        <div class="stats-grid">
+            <div class="stats-card">
+                <h4>Runs</h4>
+                <p>{{ stats.runs or 0 }}</p>
+            </div>
+            <div class="stats-card">
+                <h4>Original Registered</h4>
+                <p>{{ stats.originals_registered or 0 }}</p>
+            </div>
+            <div class="stats-card">
+                <h4>Duplicates Detected</h4>
+                <p>{{ stats.duplicates_detected or 0 }}</p>
+            </div>
+            <div class="stats-card">
+                <h4>Audio Fingerprint</h4>
+                <p>{{ stats.audio_fingerprint_detected or 0 }}</p>
+            </div>
+            <div class="stats-card">
+                <h4>Audio AI</h4>
+                <p>{{ stats.audio_ai_detected or 0 }}</p>
+            </div>
+            <div class="stats-card">
+                <h4>Video Hash</h4>
+                <p>{{ stats.video_hash_detected or 0 }}</p>
+            </div>
+            <div class="stats-card">
+                <h4>Video CLIP</h4>
+                <p>{{ stats.video_clip_detected or 0 }}</p>
+            </div>
+        </div>
+        <br>
+        <a href="/" class="back-link">Upload Another File</a>
+    </div>
+</div>

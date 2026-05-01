@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <div class = "header">
+            Copyright Detecting System
+        </div>
+        <div class="page-center">
+            <div class="container">
+                <h1>Upload Video</h1>
+
+                <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+                    <label class="file-input-label">Choose a video file</label>
+                    <div class="file-picker">
+                        <button type="button" class="file-picker-button" onclick="fileInput.click()">Select File</button>
+                        <span id="selectedFileName" class="selected-file-name">No file selected</span>
+                        <input id="fileInput" type="file" name="file" required>
+                    </div>
+
+                    <label class="file-input-label" for="customName">Custom upload name (optional)</label>
+                    <input id="customName" class="custom-name-input" type="text" name="custom_name" placeholder="Short descriptive name" maxlength="80">
+
+                    <button type="submit">Upload & Analyze</button>    
+                </form>
+            </div>
+        </div>
+
+        <div id="loadingOverlay" class="overlay hidden">
+            <div class="overlay-content">
+                <div class="spinner"></div>
+                <h2>Analyzing your upload</h2>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <div class="progress-meta">
+                    <span id="progressPercent">0%</span>
+                    <span class="progress-subtext">Analyzing file, please wait...</span>
+                </div>
+                <p id="loadingMessage" class="loading-step">Checking audio through fingerprint...</p>
+                <div id="progressSteps" class="progress-steps"></div>
+            </div>
+        </div>
+
+        <script>
+            const form = document.getElementById('uploadForm');
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const fileInput = document.getElementById('fileInput');
+            const selectedFileName = document.getElementById('selectedFileName');
+            const progressFill = document.getElementById('progressFill');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressSteps = document.getElementById('progressSteps');
+
+            const steps = [
+                'Checking audio through fingerprint',
+                'Running YAMNet analysis',
+                'Checking video through frame hashing',
+                'Comparing video frames with CLIP'
+            ];
+            const stepDuration = 2200;
+
+            fileInput.addEventListener('change', () => {
+                selectedFileName.textContent = fileInput.files.length ? fileInput.files[0].name : 'No file selected';
+            });
+
+            function renderProgressSteps() {
+                progressSteps.innerHTML = steps.map((step, idx) => {
+                    return `<div class="step-pill" data-step="${idx}"><span>${idx + 1}</span>${step}</div>`;
+                }).join('');
+            }
+
+            function updateProgress(index, percent) {
+                const active = Math.min(index, steps.length - 1);
+                progressFill.style.width = `${percent}%`;
+                progressPercent.textContent = `${Math.min(100, Math.round(percent))}%`;
+                loadingMessage.textContent = `${steps[active]}...`;
+                progressSteps.querySelectorAll('.step-pill').forEach((pill, pillIndex) => {
+                    pill.classList.toggle('active', pillIndex === active);
+                    pill.classList.toggle('completed', pillIndex < active);
+                });
+                loadingMessage.classList.add('animate');
+                setTimeout(() => loadingMessage.classList.remove('animate'), 900);
+            }
+
+            function startProgressLoop() {
+                const totalDuration = steps.length * stepDuration;
+                const startTime = performance.now();
+                function tick(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / totalDuration, 1);
+                    const currentStep = Math.min(Math.floor(elapsed / stepDuration), steps.length - 1);
+                    updateProgress(currentStep, progress * 100);
+                    if (progress < 1) {
+                        requestAnimationFrame(tick);
+                    } else {
+                        loadingMessage.textContent = 'Finalizing results...';
+                        loadingMessage.classList.add('animate');
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+
+            renderProgressSteps();
+
+            form.addEventListener('submit', () => {
+                overlay.classList.remove('hidden');
+                overlay.classList.add('show');
+                startProgressLoop();
+            });
+        </script>
+    </body>
+</html>

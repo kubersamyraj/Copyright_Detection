@@ -1,0 +1,9 @@
+{
+  "runs": 30,
+  "audio_fingerprint_detected": 6,
+  "audio_ai_detected": 6,
+  "video_hash_detected": 6,
+  "video_clip_detected": 8,
+  "duplicates_detected": 19,
+  "originals_registered": 11
+}
